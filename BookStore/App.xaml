@@ -1,0 +1,16 @@
+﻿<mefClient:MvvmApplication 
+    x:Class="BookStore.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mefClient="clr-namespace:IkitMita.Mvvm.MefClient;assembly=IkitMita.Mvvm.MefClient"
+    xmlns:viewModels="clr-namespace:BookStore.ViewModels;assembly=BookStore.ViewModels"
+    Startup="StartupHandler"
+    >
+    <mefClient:MvvmApplication.StartupViewModelType>
+        <x:Type Type="viewModels:LoginViewModel" />
+    </mefClient:MvvmApplication.StartupViewModelType>
+    <Application.Resources>
+         
+    </Application.Resources>
+</mefClient:MvvmApplication>
+

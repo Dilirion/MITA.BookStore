@@ -1,0 +1,13 @@
+﻿[
+  {
+    "FirstName": "Артур",
+    "LasName": "Кром",
+    "Birthday": "1997-01-25",
+    "HireDate": "2010-01-01",
+    "User": {
+      "Login": "Dilirion",
+      "Password": "Dilirion",
+      "Role": "Admin"
+    }
+  }
+]

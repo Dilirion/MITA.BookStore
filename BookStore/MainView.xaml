@@ -1,0 +1,86 @@
+﻿<UserControl x:Class="BookStore.MainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:BookStore.ViewModels;assembly=BookStore.ViewModels"
+             xmlns:converters="clr-namespace:IkitMita.Wpf.Converters;assembly=IkitMita.Wpf"
+             xmlns:wpf="clr-namespace:IkitMita.Wpf;assembly=IkitMita.Wpf"
+             xmlns:views="clr-namespace:IkitMita.Mvvm.Views;assembly=IkitMita.Mvvm.Views"
+             xmlns:models="clr-namespace:BookStore.DataAccess.Models;assembly=BookStore.DataAccess"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+             views:ChildViewPresenter.ViewMinHeight="480"
+             views:ChildViewPresenter.ViewMinWidth="640"
+             IsEnabled="{Binding IsFree}">
+    <UserControl.Resources>
+        <converters:BooleanConverter  OnFalse="{wpf:Visibility Collapsed}"
+                                      OnTrue="{wpf:Visibility Visible}"
+                                      x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Создать заказ"
+                      Command="{Binding CreateOrderCommand}"/>
+        </Menu>
+        
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style TargetType="TextBlock" x:Key="Separator"
+                       BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Text" Value="|"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="5 0"/>
+                </Style>
+            </StackPanel.Resources>
+            <TextBlock Text="{Binding CurrentEmployee.ShortName}"/>
+            <TextBlock Style="{StaticResource Separator}"/>
+            <TextBlock Text="{Binding CurrentEmployee.BranchTitle}"/>
+            <TextBlock Style="{StaticResource Separator}"/>
+            <TextBlock Text="Осуществляется поиск" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <TextBlock Text="{Binding FoundBooks.Count, StringFormat={}Найдено {0} книг}"
+                       Visibility="{Binding IsFree, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        </StackPanel>
+        <Grid>
+           <Grid.RowDefinitions>
+               <RowDefinition Height="Auto"/>
+               <RowDefinition Height="*"/>
+           </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Row="0" Grid.Column="0"
+                     Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Row="0" Grid.Column="1"
+                    Command="{Binding SearchBooksCommand}"
+                    IsDefault="True"
+                    Content="Найти"/>
+            <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                      ItemsSource="{Binding FoundBooks}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding BookTitle}"
+                                        Header="Название"/>
+                    <DataGridTextColumn Binding="{Binding Isbn}"
+                                        Header="ISBN"/>
+                    <DataGridTemplateColumn Header="Авторы">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type models:SearchBookModel}">
+                                <ItemsControl ItemsSource="{Binding Authors}"
+                                              DisplayMemberPath="FullName"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding Price}"
+                                        Header="Цена"/>
+                    <DataGridTextColumn Binding="{Binding Amount}"
+                                        Header="Количество"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DockPanel>
+</UserControl>

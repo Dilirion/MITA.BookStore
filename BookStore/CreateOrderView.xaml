@@ -1,0 +1,120 @@
+﻿<UserControl 
+    x:Class="BookStore.CreateOrderView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:wpf="clr-namespace:IkitMita.Wpf;assembly=IkitMita.Wpf"
+    xmlns:viewModels="clr-namespace:BookStore.ViewModels;assembly=BookStore.ViewModels"
+    xmlns:views="clr-namespace:IkitMita.Mvvm.Views;assembly=IkitMita.Mvvm.Views"
+    xmlns:models="clr-namespace:BookStore.DataAccess.Models;assembly=BookStore.DataAccess"
+    xmlns:bookStore="clr-namespace:BookStore"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    mc:Ignorable="d" 
+    d:DesignHeight="480" d:DesignWidth="480"
+    d:DataContext="{d:DesignInstance viewModels:CreateOrderViewModel}"
+    views:ChildViewPresenter.ViewMinHeight="480"
+    views:ChildViewPresenter.ViewMinWidth="480"
+    >
+    
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Top">
+            <wpf:LabeledControl Label="Клиент">
+                <ComboBox ItemsSource="{Binding Clients}" 
+                          SelectedItem="{Binding SelectedClient}"
+                          DisplayMemberPath="FullName"/>
+            </wpf:LabeledControl>
+        </StackPanel>
+
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0"
+                       Text="{Binding ErrorMessage}"
+                       Foreground="Red"/>
+
+            <Button Content="Сохранить заказ"
+                    Command="{Binding SaveOrderCommand}"
+                    Grid.Column="1"/>
+        </Grid>
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <TextBox Grid.Column="0" Grid.Row="0"
+                     x:Name="SearchTextBox">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return"
+                                Command="{Binding SearchBooksCoomand}"
+                                CommandParameter="{Binding Text, ElementName=SearchTextBox}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <ListBox Grid.Column="0" Grid.Row="1"
+                     ItemsSource="{Binding FoundBooks}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate  DataType="models:SearchBookModel">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding BookTitle}"
+                                       FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Isbn}"
+                                       FontStyle="Italic"/>
+                            <TextBlock Text="{Binding Price}"
+                                       FontStyle="Italic"/>
+                            <StackPanel.InputBindings>
+                                <MouseBinding MouseAction="LeftDoubleClick"
+                                              Command="{Binding DataContext.SelectBookCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type bookStore:CreateOrderView}}}"
+                                              CommandParameter="{Binding}"/>
+                            </StackPanel.InputBindings>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <DataGrid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                      ItemsSource="{Binding OrderedBooks}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Название" Binding="{Binding BookTitle}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Цена" Binding="{Binding Price}" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Header="Количество">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="models:SaveOrderedBookModel">
+                                <xctk:IntegerUpDown Maximum="{Binding MaxAmount}"
+                                                    Value="{Binding Amount, UpdateSourceTrigger=PropertyChanged}"
+                                                    Minimum="1"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                                            
+                    <DataGridTextColumn Header="Итого" Binding="{Binding TotalCost}" IsReadOnly="True"/>
+                    <DataGridTemplateColumn IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="models:SaveOrderedBookModel">
+                                <Button Content="X"
+                                        FontWeight="Bold"
+                                        Foreground="Red"
+                                        Command="{Binding DataContext.UnselectBookCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type bookStore:CreateOrderView}}}"
+                                        CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                
+            </DataGrid>
+            
+        </Grid>
+
+    </DockPanel>
+</UserControl>
